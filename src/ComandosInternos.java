@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -79,6 +79,15 @@ public final class ComandosInternos {
             System.out.println("Caminho inválido");
             return 1;
         }
+    }
+
+    public static void reconhecerSentenca(String arquivo) throws IOException {
+        BufferedReader saida = new BufferedReader(new FileReader(arquivo));
+        String out = "";
+        while(saida.ready()) {
+            out =  out + saida.readLine() + '\n';
+        }
+        System.out.println(out);
     }
 
     private ComandosInternos() {

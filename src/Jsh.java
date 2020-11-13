@@ -42,6 +42,7 @@ public final class Jsh {
 
     public static void executarComando(ComandoPrompt comando) {
         int out = 1;
+
         switch (comando.getNome()){
             case "encerrar":
                 System.exit(0);
@@ -53,14 +54,25 @@ public final class Jsh {
                 out = ComandosInternos.escreverListaArquivos(Optional.of(dir));
                 break;
             case "cd":
-                out = ComandosInternos.criarNovoDiretorio(comando.getArgumentos().get(1), dir);
+                if (comando.getArgumentosSize() > 1)
+                    out = ComandosInternos.criarNovoDiretorio(comando.getArgumentos().get(1), dir);
                 break;
             case "ad":
-                out = ComandosInternos.apagarDiretorio((String)comando.getArgumentos().get(1), dir);
+                if (comando.getArgumentosSize() > 1)
+                    out = ComandosInternos.apagarDiretorio((String)comando.getArgumentos().get(1), dir);
                 break;
             case "mdt":
-                out = ComandosInternos.mudarDiretorioTrabalho((String)comando.getArgumentos().get(1));
+                if (comando.getArgumentosSize() > 1)
+                    out = ComandosInternos.mudarDiretorioTrabalho((String)comando.getArgumentos().get(1));
                 break;
+            case "ts":
+                if (comando.getArgumentosSize() > 1)
+                    try {
+                        ComandosInternos.reconhecerSentenca(comando.getArgumentos().get(1));
+                    }catch (IOException i){
+                        System.out.println(i.getMessage());
+                        i.getCause();
+                    }
             default:
                 out = executarPrograma(comando);
         }
@@ -101,9 +113,11 @@ public final class Jsh {
     }
 
     public static void main(String... args) {
+
         promptTerminal();
     }
 
     private Jsh() {
+
     }
 }
