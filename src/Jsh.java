@@ -68,7 +68,7 @@ public final class Jsh {
             case "ts":
                 if (comando.getArgumentosSize() > 1)
                     try {
-                        ComandosInternos.reconhecerSentenca(comando.getArgumentos().get(1));
+                        out = ComandosInternos.reconhecerSentenca(comando.getArgumentos().get(1));
                     }catch (IOException i){
                         System.out.println(i.getMessage());
                         i.getCause();

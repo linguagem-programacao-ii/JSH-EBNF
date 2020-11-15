@@ -53,6 +53,7 @@ public final class ComandosInternos {
         String pathAtual = System.getProperty("user.dir");
         int points = 0;
         File dir;
+        int[] fr;
         if (newPath.startsWith("..")) {
             int x;
             for(x = 0; x < newPath.length() && newPath.charAt(x) == '.'; ++x) {
@@ -81,13 +82,42 @@ public final class ComandosInternos {
         }
     }
 
-    public static void reconhecerSentenca(String arquivo) throws IOException {
+    public static int reconhecerSentenca(String arquivo) throws IOException {
         BufferedReader saida = new BufferedReader(new FileReader(arquivo));
         String out = "";
         while(saida.ready()) {
             out =  out + saida.readLine() + '\n';
         }
-        System.out.println(out);
+
+        System.out.println(type(out));
+        return 0;
+    }
+
+    private static boolean type(String sentencas){
+        sentencas = sentencas.trim();
+
+        if (Character.isJavaIdentifierStart(sentencas.charAt(0))){
+            String[] primitivas = {"int", "boolean"};
+            String dem = "[]";
+                if(sentencas.split(" ").length == 1) {
+                    for (String primitiva : primitivas) {
+                        if (primitiva.equals(sentencas)) {
+                            return true;
+                        }
+                    }
+                    if (sentencas.equals(primitivas[0] + " " + dem) || sentencas.equals(primitivas[0] + dem)){
+                        return true;
+                    }
+                    for (int i=0; i < sentencas.length(); i++){
+                        if (!Character.isJavaIdentifierPart(sentencas.charAt(i))){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+        
+        return false;
     }
 
     private ComandosInternos() {
