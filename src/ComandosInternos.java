@@ -89,11 +89,20 @@ public final class ComandosInternos {
             out =  out + saida.readLine() + '\n';
         }
 
+<<<<<<< HEAD
         System.out.println(type(out));
         return 0;
     }
 
     private static boolean type(String sentencas){
+=======
+        //System.out.println(isType(out));
+        System.out.println(isVar(out));
+        return 0;
+    }
+
+    private static boolean isType(String sentencas){
+>>>>>>> 817cfff72b9f65e0eed29811605a9b01216be36e
         sentencas = sentencas.trim();
 
         if (Character.isJavaIdentifierStart(sentencas.charAt(0))){
@@ -115,9 +124,66 @@ public final class ComandosInternos {
                     }
                     return true;
                 }
+<<<<<<< HEAD
             }
         
         return false;
+=======
+        }
+        
+        return false;
+    }
+
+
+    //Reconhecedor de var; ele se comunica com isType() e isIdentifier
+    private static boolean isVar(String sentencas){
+        boolean isType, isIdentifier;
+        int fim;
+        if (sentencas.contains("[") || sentencas.contains("]")){
+            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
+                fim = sentencas.indexOf("]");
+            }else {
+                fim = sentencas.indexOf("[");
+            }
+            //System.out.println(sentencas.substring(0, fim + 1));
+            isType = isType(sentencas.substring(0, fim + 1));
+
+        }else if (!sentencas.contains(" ")){
+            if (!sentencas.contains(";")){
+                isType = isType(sentencas);
+            }else {
+                isType = false;
+            }
+            fim = sentencas.lastIndexOf(sentencas);
+        }else {
+            fim = sentencas.indexOf(" ");
+            isType = isType(sentencas.substring(0, fim - 1));
+        }
+        String subSent = sentencas.substring(fim + 1, sentencas.length() - 1).trim();
+        isIdentifier = isIdentifier(subSent);
+
+        sentencas.trim();
+        sentencas = sentencas.replace("\n", "").replace("\r", "");
+        if (isIdentifier && isType && sentencas.charAt(sentencas.length()-1) == ';'){
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
+    //reconhecedor de Identifier; n se cominica com nenhum outro metodo a não ser que seja requisitado pelo metodo em questão
+    private static boolean isIdentifier(String sentencas){
+        if (!Character.isJavaIdentifierStart(sentencas.charAt(0))){
+            return false;
+        }
+        for (int i = 0; i<sentencas.length()-1; i++){
+            if (!Character.isJavaIdentifierPart(sentencas.charAt(i))){
+                return false;
+            }
+        }
+        return true;
+>>>>>>> 817cfff72b9f65e0eed29811605a9b01216be36e
     }
 
     private ComandosInternos() {
