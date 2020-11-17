@@ -1,9 +1,10 @@
+package Comando;
+
+import Uitlidades.Utilidades;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public final class ComandosInternos {
 
@@ -83,26 +84,93 @@ public final class ComandosInternos {
     }
 
     public static int reconhecerSentenca(String arquivo) throws IOException {
-        BufferedReader saida = new BufferedReader(new FileReader(arquivo));
+        BufferedReader saida = new BufferedReader(new FileReader(Utilidades.getSistemPath(arquivo)));
         String out = "";
         while(saida.ready()) {
             out =  out + saida.readLine() + '\n';
         }
 
-<<<<<<< HEAD
-        System.out.println(type(out));
+        if (isType("int")){
+            System.out.println("foi");
+        }else {
+            System.out.println("num foi");
+        }
+
         return 0;
     }
 
-    private static boolean type(String sentencas){
-=======
-        //System.out.println(isType(out));
-        System.out.println(isVar(out));
-        return 0;
+    private static boolean isMethod(String sentenca){
+        sentenca = sentenca.trim();
+
+        if (sentenca.contains(" [] ")){
+            sentenca = sentenca.replace(" [] ", "[]");
+        }
+
+        if (Utilidades.avaliarDelimitadores(sentenca)){
+
+            Character[] delimitadores = {'(',')','{','}'};
+            List<String> sentencas;
+            if(Utilidades.existsChars(sentenca,delimitadores)){
+
+                Character[] delimitadoresPossiveis = {'(',')','{','}',','};
+
+                sentencas = dividir(sentenca,delimitadoresPossiveis);
+
+                if (sentencas.size() >= 6){
+
+                    if (declaration(sentencas.get(0), sentencas.get(1), sentencas.get(2)) && sentencas.get(3).equals("(")){
+
+                        int x;
+                        for (x=4; x < sentencas.size(); x++){
+                            if (sentencas.get(x).equals(")")){
+                                break;
+                            }
+                        }
+
+                        if (parametros(sentencas, 3, x) && sentencas.get(x+1).equals("{")){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
+
+    private static boolean parametros(List<String> sentencas, int _init, int _end){
+        int init = _init;
+        int end = _end - 1;
+        int res = end - init++;
+        System.out.println(res);
+
+        if (res != 0){
+            if (res%2 != 0){
+                int aux = init;
+                for (int x=init; x < end; x = x + 3){
+                    if (sentencas.get(x).equals(",") || sentencas.get(x).equals(")")){
+                        if (!parametros(sentencas,init,x)){
+                            return false;
+                        }
+                    }else {
+                        return false;
+                    }
+                }
+            }else {
+                System.out.println("entrou aqui");
+                System.out.println(sentencas.get(init) + " " + sentencas.get(end));
+                System.out.println(isVar(sentencas.get(init) + " " + sentencas.get(end)));
+                if (!isVar(sentencas.get(init) + " " + sentencas.get(end))){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
 
     private static boolean isType(String sentencas){
->>>>>>> 817cfff72b9f65e0eed29811605a9b01216be36e
         sentencas = sentencas.trim();
 
         if (Character.isJavaIdentifierStart(sentencas.charAt(0))){
@@ -114,21 +182,17 @@ public final class ComandosInternos {
                             return true;
                         }
                     }
-                    if (sentencas.equals(primitivas[0] + " " + dem) || sentencas.equals(primitivas[0] + dem)){
+                    if(sentencas.equals(primitivas[0] + dem)){
                         return true;
                     }
-                    for (int i=0; i < sentencas.length(); i++){
-                        if (!Character.isJavaIdentifierPart(sentencas.charAt(i))){
-                            return false;
-                        }
+                    return isIdentifier(sentencas);
+                }else{
+                    if (sentencas.equals(primitivas[0] + " " + dem)){
+                        return true;
                     }
-                    return true;
+
+                    return isIdentifier(sentencas);
                 }
-<<<<<<< HEAD
-            }
-        
-        return false;
-=======
         }
         
         return false;
@@ -177,13 +241,30 @@ public final class ComandosInternos {
         if (!Character.isJavaIdentifierStart(sentencas.charAt(0))){
             return false;
         }
-        for (int i = 0; i<sentencas.length()-1; i++){
+
+        for (int i = 0; i<sentencas.length(); i++){
             if (!Character.isJavaIdentifierPart(sentencas.charAt(i))){
                 return false;
             }
         }
         return true;
->>>>>>> 817cfff72b9f65e0eed29811605a9b01216be36e
+    }
+
+    private static List<String> dividir(String sentenca, Character[] delimitadores){
+        List<String> palavras;
+        List<Character> letras = new ArrayList<>();
+
+        for (int x=0; x < sentenca.length(); x++){
+            letras.add(sentenca.charAt(x));
+        }
+
+        palavras = Utilidades.montarLisString(letras,delimitadores,' ');
+
+        return palavras;
+    }
+
+    private static boolean declaration(String modifier, String type, String identifier){
+        return (modifier.equals("public") && isType(type) && isIdentifier(identifier));
     }
 
     private ComandosInternos() {

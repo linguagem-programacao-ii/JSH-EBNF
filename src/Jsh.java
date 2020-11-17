@@ -1,3 +1,7 @@
+import Comando.ComandoPrompt;
+import Comando.ComandosInternos;
+import Uitlidades.Utilidades;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -50,18 +54,18 @@ public final class Jsh {
             case "relogio":
                 out = ComandosInternos.exibirRelogio();
                 break;
-            case "la":
+            case "ls":
                 out = ComandosInternos.escreverListaArquivos(Optional.of(dir));
                 break;
-            case "cd":
+            case "add":
                 if (comando.getArgumentosSize() > 1)
                     out = ComandosInternos.criarNovoDiretorio(comando.getArgumentos().get(1), dir);
                 break;
-            case "ad":
+            case "del":
                 if (comando.getArgumentosSize() > 1)
                     out = ComandosInternos.apagarDiretorio((String)comando.getArgumentos().get(1), dir);
                 break;
-            case "mdt":
+            case "cd":
                 if (comando.getArgumentosSize() > 1)
                     out = ComandosInternos.mudarDiretorioTrabalho((String)comando.getArgumentos().get(1));
                 break;
@@ -73,6 +77,7 @@ public final class Jsh {
                         System.out.println(i.getMessage());
                         i.getCause();
                     }
+                break;
             default:
                 out = executarPrograma(comando);
         }
