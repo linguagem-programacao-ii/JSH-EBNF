@@ -307,6 +307,50 @@ public final class ComandosInternos {
         return true;
     }
 
+    private static boolean isMethodV2(String sentencas){
+        String subSen;
+
+        //parte que verifica presença do public como inicio da dec. de metodo
+        subSen = sentencas.trim();
+        int ap;
+        boolean ti;
+
+        if (subSen.indexOf("public") != 0){
+            return false;
+        }
+
+        if (!sentencas.contains("{") || !sentencas.contains("}")){
+            return false;
+        }
+
+        ap = sentencas.indexOf("public") + 6;
+
+        if (sentencas.contains("(") && sentencas.contains(")") && sentencas.indexOf('(') < sentencas.indexOf(')')){
+            if (!isVarSpecial(sentencas.substring(ap, sentencas.indexOf('(') - 1))){
+                return false;
+            }else {
+                ti = true;
+            }
+        }else {
+            return false;
+        }
+
+        subSen = (sentencas.substring(sentencas.indexOf('(')+1, sentencas.lastIndexOf(')'))).trim();
+        String[] para = new String[(int)subSen.chars().filter(ch -> ch == ',').count()];
+        int ind = 0;
+        for (int i = 0; i < para.length; i++){
+            try {
+                para[i] = subSen.substring(ind, subSen.indexOf(",", subSen.indexOf(",")+1));
+                System.out.println(subSen.indexOf(",", subSen.indexOf(",")+1));
+            }catch (IndexOutOfBoundsException e){
+                para[i] = subSen.substring(ind);
+                System.out.println(subSen.indexOf(",", subSen.indexOf(",")+1) + "b");
+            }
+
+            ind = ind + para[i].length()+1;
+        }
+        return true;
+    }
 
     private ComandosInternos() {
 
