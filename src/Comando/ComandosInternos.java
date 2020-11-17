@@ -89,11 +89,23 @@ public final class ComandosInternos {
         while(saida.ready()) {
             out =  out + saida.readLine() + '\n';
         }
+        boolean pass = false;
+        if (!out.isEmpty() && !out.isBlank()) {
+            out = out.trim();
 
-        if (isType("int")){
-            System.out.println("foi");
+            if (out.startsWith("public ")) {
+                pass = isMethod(out);
+            } else if (out.split(" ").length == 1){
+                pass = isType(out);
+            } else {
+                pass = isVar(out);
+            }
+        }
+
+        if(pass){
+            System.out.println("Tudo certo por aqui");
         }else {
-            System.out.println("num foi");
+            System.out.println("A sentença está errada");
         }
 
         return 0;
@@ -138,36 +150,6 @@ public final class ComandosInternos {
         return false;
     }
 
-    private static boolean parametros(List<String> sentencas, int _init, int _end){
-        int init = _init;
-        int end = _end - 1;
-        int res = end - init++;
-        System.out.println(res);
-
-        if (res != 0){
-            if (res%2 != 0){
-                int aux = init;
-                for (int x=init; x < end; x = x + 3){
-                    if (sentencas.get(x).equals(",") || sentencas.get(x).equals(")")){
-                        if (!parametros(sentencas,init,x)){
-                            return false;
-                        }
-                    }else {
-                        return false;
-                    }
-                }
-            }else {
-                System.out.println("entrou aqui");
-                System.out.println(sentencas.get(init) + " " + sentencas.get(end));
-                System.out.println(isVar(sentencas.get(init) + " " + sentencas.get(end)));
-                if (!isVar(sentencas.get(init) + " " + sentencas.get(end))){
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
 
 
     private static boolean isType(String sentencas){
@@ -238,7 +220,7 @@ public final class ComandosInternos {
 
 
     //isVarM é o isVar sem ";"
-    private static boolean isVarM(String sentencas){
+    private static boolean isVarSpecial(String sentencas){
         boolean isType, isIdentifier;
         int fim;
         if (sentencas.contains("[") || sentencas.contains("]")){
@@ -300,6 +282,35 @@ public final class ComandosInternos {
     private static boolean declaration(String modifier, String type, String identifier){
         return (modifier.equals("public") && isType(type) && isIdentifier(identifier));
     }
+
+    private static boolean parametros(List<String> sentencas, int _init, int _end){
+        int init = _init;
+        int end = _end - 1;
+        int res = end - init++;
+        System.out.println(res);
+
+        if (res != 0){
+            if (res%2 != 0){
+                int aux = init;
+                for (int x=init; x < end; x = x + 3){
+                    if (sentencas.get(x).equals(",") || sentencas.get(x).equals(")")){
+                        if (!parametros(sentencas,init,x)){
+                            return false;
+                        }
+                    }else {
+                        return false;
+                    }
+                }
+            }else {
+                if (!isVarSpecial(sentencas.get(init) + " " + sentencas.get(end))){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
 
     private ComandosInternos() {
 
