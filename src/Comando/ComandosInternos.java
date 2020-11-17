@@ -236,6 +236,40 @@ public final class ComandosInternos {
 
     }
 
+
+    //isVarM é o isVar sem ";"
+    private static boolean isVarM(String sentencas){
+        boolean isType, isIdentifier;
+        int fim;
+        if (sentencas.contains("[") || sentencas.contains("]")){
+            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
+                fim = sentencas.indexOf("]");
+            }else {
+                fim = sentencas.indexOf("[");
+            }
+            //System.out.println(sentencas.substring(0, fim + 1));
+            isType = isType(sentencas.substring(0, fim + 1));
+
+        }else if (!sentencas.contains(" ")){
+            isType = isType(sentencas);
+            fim = sentencas.lastIndexOf(sentencas);
+        }else {
+            fim = sentencas.indexOf(" ");
+            isType = isType(sentencas.substring(0, fim - 1));
+        }
+        String subSent = sentencas.substring(fim + 1, sentencas.length() - 1).trim();
+        isIdentifier = isIdentifier(subSent);
+
+        sentencas.trim();
+        sentencas = sentencas.replace("\n", "").replace("\r", "");
+        if (isIdentifier && isType){
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
     //reconhecedor de Identifier; n se cominica com nenhum outro metodo a não ser que seja requisitado pelo metodo em questão
     private static boolean isIdentifier(String sentencas){
         if (!Character.isJavaIdentifierStart(sentencas.charAt(0))){
