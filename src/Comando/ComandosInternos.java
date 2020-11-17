@@ -90,16 +90,12 @@ public final class ComandosInternos {
             out =  out + saida.readLine() + '\n';
         }
         boolean pass = false;
-        if (!out.isEmpty() && !out.isBlank()) {
-            out = out.trim();
 
-            if (out.startsWith("public ")) {
+        if (!out.isBlank() && !out.isEmpty()){
+            if (out.startsWith("public ")){
                 pass = isMethod(out);
-            } else if (out.split(" ").length == 1){
-                pass = isType(out);
-            } else {
-                pass = isVar(out);
             }
+            
         }
 
         if(pass){
