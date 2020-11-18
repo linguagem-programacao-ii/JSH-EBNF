@@ -95,8 +95,10 @@ public final class ComandosInternos {
             if (out.startsWith("public ")){
                 pass = isMethod(out);
             }
-            
+
         }
+
+        System.out.println(isMethodV2(out));
 
         if(pass){
             System.out.println("Tudo certo por aqui");
@@ -201,11 +203,12 @@ public final class ComandosInternos {
             fim = sentencas.indexOf(" ");
             isType = isType(sentencas.substring(0, fim - 1));
         }
-        String subSent = sentencas.substring(fim + 1, sentencas.length() - 1).trim();
+        String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
         isIdentifier = isIdentifier(subSent);
 
         sentencas.trim();
         sentencas = sentencas.replace("\n", "").replace("\r", "");
+
         if (isIdentifier && isType && sentencas.charAt(sentencas.length()-1) == ';'){
             return true;
         }else {
@@ -225,7 +228,7 @@ public final class ComandosInternos {
             }else {
                 fim = sentencas.indexOf("[");
             }
-            //System.out.println(sentencas.substring(0, fim + 1));
+            System.out.println("l 232");
             isType = isType(sentencas.substring(0, fim + 1));
 
         }else if (!sentencas.contains(" ")){
@@ -233,13 +236,13 @@ public final class ComandosInternos {
             fim = sentencas.lastIndexOf(sentencas);
         }else {
             fim = sentencas.indexOf(" ");
-            isType = isType(sentencas.substring(0, fim - 1));
+            System.out.println(fim);
+            isType = isType(sentencas.substring(0, fim));
         }
-        String subSent = sentencas.substring(fim + 1, sentencas.length() - 1).trim();
+        String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
         isIdentifier = isIdentifier(subSent);
 
         sentencas.trim();
-        sentencas = sentencas.replace("\n", "").replace("\r", "");
         if (isIdentifier && isType){
             return true;
         }else {
@@ -313,7 +316,6 @@ public final class ComandosInternos {
         //parte que verifica presença do public como inicio da dec. de metodo
         subSen = sentencas.trim();
         int ap;
-        boolean ti;
 
         if (subSen.indexOf("public") != 0){
             return false;
@@ -323,32 +325,35 @@ public final class ComandosInternos {
             return false;
         }
 
-        ap = sentencas.indexOf("public") + 6;
+        ap = sentencas.indexOf("public") + 7;
 
         if (sentencas.contains("(") && sentencas.contains(")") && sentencas.indexOf('(') < sentencas.indexOf(')')){
             if (!isVarSpecial(sentencas.substring(ap, sentencas.indexOf('(') - 1))){
                 return false;
-            }else {
-                ti = true;
             }
+
         }else {
             return false;
         }
 
+
+
         subSen = (sentencas.substring(sentencas.indexOf('(')+1, sentencas.lastIndexOf(')'))).trim();
         String[] para = new String[(int)subSen.chars().filter(ch -> ch == ',').count()];
         int ind = 0;
+        //problema1 : esse for não está conseguindo gerar mais de um parametro de metodo na forma de array, fazendo reconhecimento de metodos com + de 1 parametro não confiaveis
+        //a ideia é separar os parametros em diferentes elementos do array para serem avaliados separadamente pelo isVarEspecial
         for (int i = 0; i < para.length; i++){
             try {
-                para[i] = subSen.substring(ind, subSen.indexOf(",", subSen.indexOf(",")+1));
-                System.out.println(subSen.indexOf(",", subSen.indexOf(",")+1));
-            }catch (IndexOutOfBoundsException e){
+                para[i] = subSen.substring(ind, subSen.indexOf(",", subSen.indexOf(",")+ind));
+            }catch (StringIndexOutOfBoundsException e){
                 para[i] = subSen.substring(ind);
-                System.out.println(subSen.indexOf(",", subSen.indexOf(",")+1) + "b");
             }
 
-            ind = ind + para[i].length()+1;
+            ind = ind + para[i].length()-1;
         }
+
+
         return true;
     }
 
