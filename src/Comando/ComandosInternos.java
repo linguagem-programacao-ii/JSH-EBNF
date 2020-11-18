@@ -90,22 +90,23 @@ public final class ComandosInternos {
             out =  out + saida.readLine() + '\n';
         }
         boolean pass = false;
-
+        /**
         if (!out.isBlank() && !out.isEmpty()){
             if (out.startsWith("public ")){
                 pass = isMethod(out);
             }
 
         }
-
+        **/
         System.out.println(isMethodV2(out));
 
+        /**
         if(pass){
             System.out.println("Tudo certo por aqui");
         }else {
             System.out.println("A sentença está errada");
         }
-
+        **/
         return 0;
     }
 
@@ -153,7 +154,8 @@ public final class ComandosInternos {
     private static boolean isType(String sentencas){
         sentencas = sentencas.trim();
 
-        if (Character.isJavaIdentifierStart(sentencas.charAt(0))){
+        if (Character.isJavaIdentifierStart(sentencas.
+                charAt(0))){
             String[] primitivas = {"int", "boolean"};
             String dem = "[]";
                 if(sentencas.split(" ").length == 1) {
@@ -189,6 +191,7 @@ public final class ComandosInternos {
             }else {
                 fim = sentencas.indexOf("[");
             }
+
             //System.out.println(sentencas.substring(0, fim + 1));
             isType = isType(sentencas.substring(0, fim + 1));
 
@@ -209,6 +212,16 @@ public final class ComandosInternos {
         sentencas.trim();
         sentencas = sentencas.replace("\n", "").replace("\r", "");
 
+        int count = 0;
+        for (int i = 0; i<sentencas.length(); i++){
+            if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
+                count = count+1;
+            }
+        }
+        if (count != 1){
+            return false;
+        }
+
         if (isIdentifier && isType && sentencas.charAt(sentencas.length()-1) == ';'){
             return true;
         }else {
@@ -228,10 +241,10 @@ public final class ComandosInternos {
             }else {
                 fim = sentencas.indexOf("[");
             }
-            System.out.println("l 232");
             isType = isType(sentencas.substring(0, fim + 1));
 
         }else if (!sentencas.contains(" ")){
+
             isType = isType(sentencas);
             fim = sentencas.lastIndexOf(sentencas);
         }else {
@@ -243,6 +256,17 @@ public final class ComandosInternos {
         isIdentifier = isIdentifier(subSent);
 
         sentencas.trim();
+
+        int count = 0;
+        for (int i = 0; i<sentencas.length(); i++){
+            if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
+                count = count+1;
+            }
+        }
+        if (count != 1){
+            return false;
+        }
+
         if (isIdentifier && isType){
             return true;
         }else {
@@ -312,48 +336,61 @@ public final class ComandosInternos {
 
     private static boolean isMethodV2(String sentencas){
         String subSen;
-
-        //parte que verifica presença do public como inicio da dec. de metodo
+        sentencas = sentencas.trim();
         subSen = sentencas.trim();
         int ap;
 
         if (subSen.indexOf("public") != 0){
+            System.out.println("public false");
             return false;
         }
 
-        if (!sentencas.contains("{") || !sentencas.contains("}")){
+        if (!sentencas.contains("{") || !sentencas.contains("}") && !(sentencas.indexOf('{') < sentencas.indexOf('}'))){
+            System.out.println("{} false");
             return false;
         }
 
         ap = sentencas.indexOf("public") + 7;
 
-        if (sentencas.contains("(") && sentencas.contains(")") && sentencas.indexOf('(') < sentencas.indexOf(')')){
+        if (sentencas.contains("(") && sentencas.contains(")") && sentencas.indexOf('(') < sentencas.lastIndexOf(')')){
             if (!isVarSpecial(sentencas.substring(ap, sentencas.indexOf('(') - 1))){
+                System.out.println("nome e type do metodo false");
                 return false;
             }
 
         }else {
+            System.out.println("() false");
             return false;
         }
 
-
-
         subSen = (sentencas.substring(sentencas.indexOf('(')+1, sentencas.lastIndexOf(')'))).trim();
-        String[] para = new String[(int)subSen.chars().filter(ch -> ch == ',').count()];
+        String[] para = new String[(int)subSen.chars().filter(ch -> ch == ',').count()+1];
         int ind = 0;
-        //problema1 : esse for não está conseguindo gerar mais de um parametro de metodo na forma de array, fazendo reconhecimento de metodos com + de 1 parametro não confiaveis
-        //a ideia é separar os parametros em diferentes elementos do array para serem avaliados separadamente pelo isVarEspecial
-        for (int i = 0; i < para.length; i++){
-            try {
-                para[i] = subSen.substring(ind, subSen.indexOf(",", subSen.indexOf(",")+ind));
-            }catch (StringIndexOutOfBoundsException e){
-                para[i] = subSen.substring(ind);
-            }
+        para[0] = subSen.substring(ind, subSen.indexOf(','));
+        if (para.length>1){
 
-            ind = ind + para[i].length()-1;
+            //essa bosta abaixo n funciona direito
+            for (int i = 1; i < para.length; i++){
+                ind = ind + para[i-1].length()+1;
+
+                if (!(subSen.lastIndexOf(',') == subSen.indexOf(',', subSen.indexOf(',') + 1))){
+                    para[i] = subSen.substring(ind, subSen.indexOf(',', subSen.indexOf(',') + 1));
+                }else {
+                    para[i] = subSen.substring(subSen.lastIndexOf(',')+1);
+                }
+
+                para[i] = para[i].trim();
+            }
         }
 
-
+        for (int i =0; i <para.length; i++){
+            System.out.println(para[i]);
+            if (!isVarSpecial(para[i])){
+                System.out.println(para[i] + " -> parametro não passou na verific. de type name");
+                return false;
+            }
+        }
+        System.out.println("sucesso");
         return true;
     }
 
