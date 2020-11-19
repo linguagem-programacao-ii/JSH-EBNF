@@ -103,6 +103,8 @@ public final class ComandosInternos {
                     pass = isType(out);
                 } else if (separacao.length == 2 && out.endsWith(" ;")){
                     out = out.replace(" ;", ";");
+                    int i = reconhecerSentenca(out);
+                } else if (separacao.length >= 2){
 
                 }
             }
@@ -177,18 +179,6 @@ public final class ComandosInternos {
                     fim = sentencas.indexOf("[");
                 }
 
-<<<<<<< Updated upstream
-            //System.out.println(sentencas.substring(0, fim + 1));
-            isType = isType(sentencas.substring(0, fim + 1));
-            if (!isType){
-                return false;
-            }
-        }else if (!sentencas.contains(" ")){
-            if (!sentencas.contains(";")){
-                isType = isType(sentencas);
-            }else {
-                isType = false;
-=======
                 //System.out.println(sentencas.substring(0, fim + 1));
                 isType = isType(sentencas.substring(0, fim + 1));
 
@@ -202,7 +192,6 @@ public final class ComandosInternos {
             } else {
                 fim = sentencas.indexOf(" ");
                 isType = isType(sentencas.substring(0, fim - 1));
->>>>>>> Stashed changes
             }
             String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
             isIdentifier = isIdentifier(subSent);
@@ -234,20 +223,6 @@ public final class ComandosInternos {
 
     //isVarM é o isVar sem ";"
     private static boolean isVarSpecial(String sentencas){
-<<<<<<< Updated upstream
-        boolean isType, isIdentifier;
-        int fim;
-        if (sentencas.contains("[") || sentencas.contains("]")){
-            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
-                fim = sentencas.indexOf("]");
-            }else {
-                fim = sentencas.indexOf("[");
-            }
-            isType = isType(sentencas.substring(0, fim + 1));
-            if (!isType){
-                return false;
-            }
-=======
         if (!sentencas.isEmpty() && !sentencas.isBlank()) {
             boolean isType, isIdentifier;
             int fim;
@@ -258,7 +233,6 @@ public final class ComandosInternos {
                     fim = sentencas.indexOf("[");
                 }
                 isType = isType(sentencas.substring(0, fim + 1));
->>>>>>> Stashed changes
 
             } else if (!sentencas.contains(" ")) {
 
