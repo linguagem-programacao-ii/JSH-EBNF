@@ -103,8 +103,6 @@ public final class ComandosInternos {
                     pass = isType(out);
                 } else if (separacao.length == 2 && out.endsWith(" ;")){
                     out = out.replace(" ;", ";");
-                    int i = reconhecerSentenca(out);
-                } else if (separacao.length >= 2){
 
                 }
             }
