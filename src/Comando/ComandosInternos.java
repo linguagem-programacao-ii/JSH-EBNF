@@ -194,7 +194,9 @@ public final class ComandosInternos {
 
             //System.out.println(sentencas.substring(0, fim + 1));
             isType = isType(sentencas.substring(0, fim + 1));
-
+            if (!isType){
+                return false;
+            }
         }else if (!sentencas.contains(" ")){
             if (!sentencas.contains(";")){
                 isType = isType(sentencas);
@@ -242,6 +244,9 @@ public final class ComandosInternos {
                 fim = sentencas.indexOf("[");
             }
             isType = isType(sentencas.substring(0, fim + 1));
+            if (!isType){
+                return false;
+            }
 
         }else if (!sentencas.contains(" ")){
 
