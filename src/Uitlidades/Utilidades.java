@@ -56,41 +56,6 @@ public class Utilidades {
         return true;
     }
 
-
-    public static List<String> montarLisString(List<Character> letras, Character[] delimitadores, char regex){
-        List<String> palavras = new ArrayList<>();
-        String out = "";
-        boolean nextOperation = false;
-        char letraA=' ';
-
-        for (Character letra : letras){
-            for (Character delimitador : delimitadores){
-                if (letra.equals(delimitador)){
-                    nextOperation = true;
-                    letraA = letra;
-                    break;
-                }
-            }
-            if (nextOperation){
-                if (!out.isBlank() && !out.isEmpty()){
-                    palavras.add(out.trim());
-                }
-                palavras.add(Character.toString(letraA));
-                out = "";
-                nextOperation=false;
-            }else if (letra.equals(regex)){
-                if (!out.isEmpty() && !out.isBlank()){
-                    palavras.add(out.trim());
-                }
-                out = "";
-            }else {
-                out = out + letra;
-            }
-        }
-
-        return palavras;
-    }
-
     public static String getSistemPath(){
         return System.getProperty("user.dir") + System.getProperty("file.separator");
     }

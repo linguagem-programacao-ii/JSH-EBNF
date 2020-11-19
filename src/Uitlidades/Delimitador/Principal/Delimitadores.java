@@ -4,8 +4,8 @@ import Uitlidades.Delimitador.Pilha.Pilha;
 public class Delimitadores {
 
     private Pilha<Character> pilha;
-    private char[] chaveAberta = {'{','[','('};
-    private char[] chaveFechada = {'}',']',')'};
+    private char[] chaveAberta = {'{','('};
+    private char[] chaveFechada = {'}',')'};
 
     public Delimitadores(){
     };
@@ -13,7 +13,7 @@ public class Delimitadores {
     public char avalia(String text) throws SemCorrespondenteException{
         pilha = new Pilha<Character>(text.length());
         for (int xx=0; xx < text.length(); xx++) {
-            for (int x = 0; x < 2; x++) {
+            for (int x = 0; x < 1; x++) {
                 if (text.charAt(xx) == chaveAberta[x]){
                     this.pilha.insert(chaveAberta[x]);
                 }else if (text.charAt(xx) == chaveFechada[x]){

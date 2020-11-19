@@ -17,12 +17,12 @@ public final class ComandosInternos {
     }
 
     public static int escreverListaArquivos(Optional<String> nomeDir) {
-        File dir = new File((String)nomeDir.get());
+        File dir = new File((String) nomeDir.get());
         List<File> listArq = Arrays.asList(dir.listFiles());
         StringBuilder out = new StringBuilder();
 
-        for(int x = 0; x < listArq.size(); ++x) {
-            out.append(((File)listArq.get(x)).getName() + '\n');
+        for (int x = 0; x < listArq.size(); ++x) {
+            out.append(((File) listArq.get(x)).getName() + '\n');
         }
 
         System.out.println(out.toString());
@@ -57,11 +57,11 @@ public final class ComandosInternos {
         int[] fr;
         if (newPath.startsWith("..")) {
             int x;
-            for(x = 0; x < newPath.length() && newPath.charAt(x) == '.'; ++x) {
+            for (x = 0; x < newPath.length() && newPath.charAt(x) == '.'; ++x) {
                 ++points;
             }
 
-            for(x = 0; x < points - 1; ++x) {
+            for (x = 0; x < points - 1; ++x) {
                 pathAtual = pathAtual.substring(0, pathAtual.lastIndexOf(barra));
             }
 
@@ -86,112 +86,100 @@ public final class ComandosInternos {
     public static int reconhecerSentenca(String arquivo) throws IOException {
         BufferedReader saida = new BufferedReader(new FileReader(Utilidades.getSistemPath(arquivo)));
         String out = "";
-        while(saida.ready()) {
-            out =  out + saida.readLine() + '\n';
+        while (saida.ready()) {
+            out = out + saida.readLine() + '\n';
         }
+        out = out.trim();
         boolean pass = false;
-        /**
-        if (!out.isBlank() && !out.isEmpty()){
-            if (out.startsWith("public ")){
+
+        if (!out.isBlank() && !out.isEmpty()) {
+            String[] separacao = out.split(" ");
+            if (separacao[0].equals("public")) {
                 pass = isMethod(out);
+            } else if (separacao.length == 1) {
+                pass = isType(out);
+            } else {
+                if (separacao.length == 2 && out.endsWith("]")) {
+                    pass = isType(out);
+                } else if (separacao.length == 2 && out.endsWith(" ;")){
+                    out = out.replace(" ;", ";");
+                    int i = reconhecerSentenca(out);
+                } else if (separacao.length >= 2){
+
+                }
             }
-
         }
-        **/
-        System.out.println(isMethodV2(out));
 
-        /**
-        if(pass){
+        if (pass) {
             System.out.println("Tudo certo por aqui");
-        }else {
+        } else {
             System.out.println("A sentença está errada");
         }
-        **/
+
         return 0;
     }
 
-    private static boolean isMethod(String sentenca){
-        sentenca = sentenca.trim();
-
-        if (sentenca.contains(" [] ")){
-            sentenca = sentenca.replace(" [] ", "[]");
-        }
-
-        if (Utilidades.avaliarDelimitadores(sentenca)){
-
-            Character[] delimitadores = {'(',')','{','}'};
-            List<String> sentencas;
-            if(Utilidades.existsChars(sentenca,delimitadores)){
-
-                Character[] delimitadoresPossiveis = {'(',')','{','}',','};
-
-                sentencas = dividir(sentenca,delimitadoresPossiveis);
-
-                if (sentencas.size() >= 6){
-
-                    if (declaration(sentencas.get(0), sentencas.get(1), sentencas.get(2)) && sentencas.get(3).equals("(")){
-
-                        int x;
-                        for (x=4; x < sentencas.size(); x++){
-                            if (sentencas.get(x).equals(")")){
-                                break;
+    private static boolean isType(String sentencas) {
+        sentencas = sentencas.trim();
+        if (!sentencas.isEmpty() && !sentencas.isBlank()) {
+            if (Character.isJavaIdentifierStart(sentencas.charAt(0))) {
+                String aux;
+                boolean pass = false;
+                if (sentencas.endsWith("]")) {
+                    if (sentencas.contains("[")) {
+                        aux = sentencas.substring(sentencas.lastIndexOf('['), sentencas.lastIndexOf("]"));
+                        if (aux.equals("[]")) {
+                            pass = true;
+                        } else {
+                            String replace = "[";
+                            for (int x = 1; x < (aux.length() - 1); x++) {
+                                if (aux.charAt(x) != ' ') {
+                                    return false;
+                                }
+                                replace = replace + ' ';
                             }
+                            replace = replace + ']';
+                            sentencas = sentencas.replace(replace, "[]");
+                            pass = true;
                         }
+                    }else {
+                        return false;
+                    }
+                }
 
-                        if (parametros(sentencas, 3, x) && sentencas.get(x+1).equals("{")){
+                if (pass) {
+                    if (sentencas.equals("int[]")){
+                        return true;
+                    }
+                    String[] div = sentencas.split(" ");
+                    if (div.length == 2){
+                        if (div[0].equals("int") && div[1].equals("[]")){
                             return true;
                         }
                     }
+                } else {
+                    return isIdentifier(sentencas);
                 }
             }
         }
-
-        return false;
-    }
-
-
-
-    private static boolean isType(String sentencas){
-        sentencas = sentencas.trim();
-
-        if (Character.isJavaIdentifierStart(sentencas.
-                charAt(0))){
-            String[] primitivas = {"int", "boolean"};
-            String dem = "[]";
-                if(sentencas.split(" ").length == 1) {
-                    for (String primitiva : primitivas) {
-                        if (primitiva.equals(sentencas)) {
-                            return true;
-                        }
-                    }
-                    if(sentencas.equals(primitivas[0] + dem)){
-                        return true;
-                    }
-                    return isIdentifier(sentencas);
-                }else{
-                    if (sentencas.equals(primitivas[0] + " " + dem)){
-                        return true;
-                    }
-
-                    return isIdentifier(sentencas);
-                }
-        }
-        
         return false;
     }
 
 
     //Reconhecedor de var; ele se comunica com isType() e isIdentifier
-    private static boolean isVar(String sentencas){
-        boolean isType, isIdentifier;
-        int fim;
-        if (sentencas.contains("[") || sentencas.contains("]")){
-            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
-                fim = sentencas.indexOf("]");
-            }else {
-                fim = sentencas.indexOf("[");
-            }
+    private static boolean isVar(String sentencas) {
+        if (!sentencas.isEmpty() && !sentencas.isBlank()) {
+            boolean isType, isIdentifier;
+            int fim;
 
+            if (sentencas.contains("[") || sentencas.contains("]")) {
+                if (sentencas.indexOf("]") > sentencas.indexOf("[")) {
+                    fim = sentencas.indexOf("]");
+                } else {
+                    fim = sentencas.indexOf("[");
+                }
+
+<<<<<<< Updated upstream
             //System.out.println(sentencas.substring(0, fim + 1));
             isType = isType(sentencas.substring(0, fim + 1));
             if (!isType){
@@ -202,39 +190,53 @@ public final class ComandosInternos {
                 isType = isType(sentencas);
             }else {
                 isType = false;
+=======
+                //System.out.println(sentencas.substring(0, fim + 1));
+                isType = isType(sentencas.substring(0, fim + 1));
+
+            } else if (!sentencas.contains(" ")) {
+                if (!sentencas.contains(";")) {
+                    isType = isType(sentencas);
+                } else {
+                    isType = false;
+                }
+                fim = sentencas.lastIndexOf(sentencas);
+            } else {
+                fim = sentencas.indexOf(" ");
+                isType = isType(sentencas.substring(0, fim - 1));
+>>>>>>> Stashed changes
             }
-            fim = sentencas.lastIndexOf(sentencas);
-        }else {
-            fim = sentencas.indexOf(" ");
-            isType = isType(sentencas.substring(0, fim - 1));
-        }
-        String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
-        isIdentifier = isIdentifier(subSent);
+            String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
+            isIdentifier = isIdentifier(subSent);
 
-        sentencas.trim();
-        sentencas = sentencas.replace("\n", "").replace("\r", "");
+            sentencas.trim();
+            sentencas = sentencas.replace("\n", "").replace("\r", "");
 
-        int count = 0;
-        for (int i = 0; i<sentencas.length(); i++){
-            if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
-                count = count+1;
+            int count = 0;
+            for (int i = 0; i < sentencas.length(); i++) {
+                if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i + 1))) {
+                    count = count + 1;
+                }
             }
-        }
-        if (count != 1){
-            return false;
-        }
+            if (count != 1) {
+                return false;
+            }
 
-        if (isIdentifier && isType && sentencas.charAt(sentencas.length()-1) == ';'){
-            return true;
-        }else {
-            return false;
-        }
+            if (isIdentifier && isType && sentencas.charAt(sentencas.length() - 1) == ';') {
+                return true;
+            } else {
+                return false;
+            }
 
+
+        }
+        return false;
     }
 
 
     //isVarM é o isVar sem ";"
     private static boolean isVarSpecial(String sentencas){
+<<<<<<< Updated upstream
         boolean isType, isIdentifier;
         int fim;
         if (sentencas.contains("[") || sentencas.contains("]")){
@@ -247,156 +249,142 @@ public final class ComandosInternos {
             if (!isType){
                 return false;
             }
+=======
+        if (!sentencas.isEmpty() && !sentencas.isBlank()) {
+            boolean isType, isIdentifier;
+            int fim;
+            if (sentencas.contains("[") || sentencas.contains("]")) {
+                if (sentencas.indexOf("]") > sentencas.indexOf("[")) {
+                    fim = sentencas.indexOf("]");
+                } else {
+                    fim = sentencas.indexOf("[");
+                }
+                isType = isType(sentencas.substring(0, fim + 1));
+>>>>>>> Stashed changes
 
-        }else if (!sentencas.contains(" ")){
+            } else if (!sentencas.contains(" ")) {
 
-            isType = isType(sentencas);
-            fim = sentencas.lastIndexOf(sentencas);
-        }else {
-            fim = sentencas.indexOf(" ");
-            System.out.println(fim);
-            isType = isType(sentencas.substring(0, fim));
-        }
-        String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
-        isIdentifier = isIdentifier(subSent);
+                isType = isType(sentencas);
+                fim = sentencas.lastIndexOf(sentencas);
+            } else {
+                fim = sentencas.indexOf(" ");
+                System.out.println(fim);
+                isType = isType(sentencas.substring(0, fim));
+            }
+            String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
+            isIdentifier = isIdentifier(subSent);
 
-        sentencas.trim();
+            sentencas.trim();
 
-        int count = 0;
-        for (int i = 0; i<sentencas.length(); i++){
-            if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
-                count = count+1;
+            int count = 0;
+            for (int i = 0; i < sentencas.length(); i++) {
+                if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i + 1))) {
+                    count = count + 1;
+                }
+            }
+            if (count != 1) {
+                return false;
+            }
+
+            if (isIdentifier && isType) {
+                return true;
+            } else {
+                return false;
             }
         }
-        if (count != 1){
-            return false;
-        }
-
-        if (isIdentifier && isType){
-            return true;
-        }else {
-            return false;
-        }
-
+        return false;
     }
 
     //reconhecedor de Identifier; n se cominica com nenhum outro metodo a não ser que seja requisitado pelo metodo em questão
     private static boolean isIdentifier(String sentencas){
-        if (!Character.isJavaIdentifierStart(sentencas.charAt(0))){
-            return false;
-        }
-
-        for (int i = 0; i<sentencas.length(); i++){
-            if (!Character.isJavaIdentifierPart(sentencas.charAt(i))){
+        if (!sentencas.isBlank() && !sentencas.isEmpty()) {
+            if (!Character.isJavaIdentifierStart(sentencas.charAt(0))) {
                 return false;
             }
-        }
-        return true;
-    }
 
-    private static List<String> dividir(String sentenca, Character[] delimitadores){
-        List<String> palavras;
-        List<Character> letras = new ArrayList<>();
-
-        for (int x=0; x < sentenca.length(); x++){
-            letras.add(sentenca.charAt(x));
-        }
-
-        palavras = Utilidades.montarLisString(letras,delimitadores,' ');
-
-        return palavras;
-    }
-
-    private static boolean declaration(String modifier, String type, String identifier){
-        return (modifier.equals("public") && isType(type) && isIdentifier(identifier));
-    }
-
-    private static boolean parametros(List<String> sentencas, int _init, int _end){
-        int init = _init;
-        int end = _end - 1;
-        int res = end - init++;
-        System.out.println(res);
-
-        if (res != 0){
-            if (res%2 != 0){
-                int aux = init;
-                for (int x=init; x < end; x = x + 3){
-                    if (sentencas.get(x).equals(",") || sentencas.get(x).equals(")")){
-                        if (!parametros(sentencas,init,x)){
-                            return false;
-                        }
-                    }else {
-                        return false;
-                    }
-                }
-            }else {
-                if (!isVarSpecial(sentencas.get(init) + " " + sentencas.get(end))){
+            for (int i = 0; i < sentencas.length(); i++) {
+                if (!Character.isJavaIdentifierPart(sentencas.charAt(i))) {
                     return false;
                 }
             }
+            return true;
         }
-
-        return true;
+        return false;
     }
 
-    private static boolean isMethodV2(String sentencas){
-        String subSen;
-        sentencas = sentencas.trim();
-        subSen = sentencas.trim();
-        int ap;
-
-        if (subSen.indexOf("public") != 0){
-            System.out.println("public false");
-            return false;
-        }
-
-        if (!sentencas.contains("{") || !sentencas.contains("}") && !(sentencas.indexOf('{') < sentencas.indexOf('}'))){
-            System.out.println("{} false");
-            return false;
-        }
-
-        ap = sentencas.indexOf("public") + 7;
-
-        if (sentencas.contains("(") && sentencas.contains(")") && sentencas.indexOf('(') < sentencas.lastIndexOf(')')){
-            if (!isVarSpecial(sentencas.substring(ap, sentencas.indexOf('(') - 1))){
-                System.out.println("nome e type do metodo false");
-                return false;
-            }
-
-        }else {
-            System.out.println("() false");
-            return false;
-        }
-
-        subSen = (sentencas.substring(sentencas.indexOf('(')+1, sentencas.lastIndexOf(')'))).trim();
-        String[] para = new String[(int)subSen.chars().filter(ch -> ch == ',').count()+1];
-        int ind = 0;
-        para[0] = subSen.substring(ind, subSen.indexOf(','));
-        if (para.length>1){
-
-            //essa bosta abaixo n funciona direito
-            for (int i = 1; i < para.length; i++){
-                ind = ind + para[i-1].length()+1;
-
-                if (!(subSen.lastIndexOf(',') == subSen.indexOf(',', subSen.indexOf(',') + 1))){
-                    para[i] = subSen.substring(ind, subSen.indexOf(',', subSen.indexOf(',') + 1));
-                }else {
-                    para[i] = subSen.substring(subSen.lastIndexOf(',')+1);
+    private static boolean isMethod(String sentenca){
+        sentenca = sentenca.trim();
+        if(sentenca.contains("(")){
+            String aux = sentenca.substring(0,sentenca.indexOf('(') - 1).trim(); //Até antes de encontrar (
+            if (declaration(aux)){
+                aux = sentenca.substring(sentenca.indexOf('('), sentenca.length() - 1).trim();
+                if (aux.contains(")")){
+                    aux = sentenca.substring(sentenca.indexOf('(') + 1, sentenca.lastIndexOf(')') - 1).trim();
+                    boolean pass = false;
+                    if (!aux.isEmpty() && !aux.isBlank()){
+                        pass = parametros(aux.trim());
+                    }else {
+                        pass = true;
+                    }
+                    if (pass){
+                        aux = sentenca.substring(sentenca.indexOf(')'), sentenca.length() - 1).trim();
+                        if (aux.contains("{")){
+                            aux = sentenca.substring(sentenca.indexOf(')') + 1, sentenca.indexOf('{') - 1).trim();
+                            if (aux.isBlank() || aux.isEmpty()){
+                                aux = sentenca.substring(sentenca.indexOf('{'), sentenca.length() - 1).trim();
+                                if (aux.endsWith("}")){
+                                    return true;
+                                }
+                            }
+                        }
+                    }
                 }
+            }
+        }
+        return false;
+    }
 
-                para[i] = para[i].trim();
+
+
+    private static boolean declaration(String sentenca){
+        if (!sentenca.isBlank() && !sentenca.isEmpty()) {
+            String[] palavras = sentenca.split(" ");
+            if (palavras[0].equals("public")) {
+                if (isIdentifier(palavras[palavras.length - 1])) {
+                    String resto = "";
+                    for (int x = 1; x < palavras.length - 1; x++) {
+                        resto = resto + ' ' + palavras[x];
+                    }
+                    resto = resto.trim();
+                    return isType(resto);
+                }
             }
         }
 
-        for (int i =0; i <para.length; i++){
-            System.out.println(para[i]);
-            if (!isVarSpecial(para[i])){
-                System.out.println(para[i] + " -> parametro não passou na verific. de type name");
-                return false;
+        return false;
+    }
+
+    public static boolean parametros(String sentenca){
+        if (!sentenca.isEmpty() && !sentenca.isBlank()) {
+            if (sentenca.contains(",")) {
+                if (!sentenca.endsWith(",")){
+                    String[] palavras = sentenca.split(",");
+                    for (int x=0; x < palavras.length; x++){
+                        if (!parametros(palavras[x])){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }else{
+                if (!isVarSpecial(sentenca)){
+                    return false;
+                }
+                return true;
             }
+            return false;
         }
-        System.out.println("sucesso");
-        return true;
+        return false;
     }
 
     private ComandosInternos() {

@@ -76,6 +76,11 @@ public final class Jsh {
                     }catch (IOException i){
                         System.out.println(i.getMessage());
                         i.getCause();
+                    }catch (Exception e){
+                        System.out.println(e.getMessage());
+                        e.getCause();
+                        e.printStackTrace();
+                        System.out.println("Erro!!!");
                     }
                 break;
             default:
