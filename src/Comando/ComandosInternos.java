@@ -167,106 +167,104 @@ public final class ComandosInternos {
 
 
     //Reconhecedor de var; ele se comunica com isType() e isIdentifier
-    private static boolean isVar(String sentencas) {
-        if (!sentencas.isEmpty() && !sentencas.isBlank()) {
-            boolean isType, isIdentifier;
-            int fim;
-
-            if (sentencas.contains("[") || sentencas.contains("]")) {
-                if (sentencas.indexOf("]") > sentencas.indexOf("[")) {
-                    fim = sentencas.indexOf("]");
-                } else {
-                    fim = sentencas.indexOf("[");
-                }
-
-                //System.out.println(sentencas.substring(0, fim + 1));
-                isType = isType(sentencas.substring(0, fim + 1));
-
-            } else if (!sentencas.contains(" ")) {
-                if (!sentencas.contains(";")) {
-                    isType = isType(sentencas);
-                } else {
-                    isType = false;
-                }
-                fim = sentencas.lastIndexOf(sentencas);
-            } else {
-                fim = sentencas.indexOf(" ");
-                isType = isType(sentencas.substring(0, fim - 1));
+    //Reconhecedor de var; ele se comunica com isType() e isIdentifier
+    private static boolean isVar(String sentencas){
+        boolean isType, isIdentifier;
+        int fim;
+        if (sentencas.contains("[") || sentencas.contains("]")){
+            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
+                fim = sentencas.indexOf("]");
+            }else {
+                fim = sentencas.indexOf("[");
             }
-            String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
-            isIdentifier = isIdentifier(subSent);
 
-            sentencas.trim();
-            sentencas = sentencas.replace("\n", "").replace("\r", "");
-
-            int count = 0;
-            for (int i = 0; i < sentencas.length(); i++) {
-                if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i + 1))) {
-                    count = count + 1;
-                }
-            }
-            if (count != 1) {
+            //System.out.println(sentencas.substring(0, fim + 1));
+            isType = isType(sentencas.substring(0, fim + 1));
+            if (!isType){
                 return false;
             }
-
-            if (isIdentifier && isType && sentencas.charAt(sentencas.length() - 1) == ';') {
-                return true;
-            } else {
+        }else if (!sentencas.contains(" ")){
+            if (!sentencas.contains(";")){
+                isType = isType(sentencas);
+            }else {
                 return false;
             }
-
-
+            fim = sentencas.lastIndexOf(sentencas);
+        }else {
+            fim = sentencas.indexOf(" ");
+            isType = isType(sentencas.substring(0, fim - 1));
         }
-        return false;
+        String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
+        isIdentifier = isIdentifier(subSent);
+
+        sentencas.trim();
+        sentencas = sentencas.replace("\n", "").replace("\r", "");
+
+        int count = 0;
+        for (int i = 0; i<sentencas.length(); i++){
+            if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
+                count = count+1;
+            }
+        }
+        if (count != 1){
+            return false;
+        }
+
+        if (isIdentifier && isType && sentencas.charAt(sentencas.length()-1) == ';'){
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
 
     //isVarM é o isVar sem ";"
     private static boolean isVarSpecial(String sentencas){
-        if (!sentencas.isEmpty() && !sentencas.isBlank()) {
-            boolean isType, isIdentifier;
-            int fim;
-            if (sentencas.contains("[") || sentencas.contains("]")) {
-                if (sentencas.indexOf("]") > sentencas.indexOf("[")) {
-                    fim = sentencas.indexOf("]");
-                } else {
-                    fim = sentencas.indexOf("[");
-                }
-                isType = isType(sentencas.substring(0, fim + 1));
-
-            } else if (!sentencas.contains(" ")) {
-
-                isType = isType(sentencas);
-                fim = sentencas.lastIndexOf(sentencas);
-            } else {
-                fim = sentencas.indexOf(" ");
-                System.out.println(fim);
-                isType = isType(sentencas.substring(0, fim));
+        boolean isType, isIdentifier;
+        int fim;
+        if (sentencas.contains("[") || sentencas.contains("]")){
+            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
+                fim = sentencas.indexOf("]");
+            }else {
+                fim = sentencas.indexOf("[");
             }
-            String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
-            isIdentifier = isIdentifier(subSent);
-
-            sentencas.trim();
-
-            int count = 0;
-            for (int i = 0; i < sentencas.length(); i++) {
-                if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i + 1))) {
-                    count = count + 1;
-                }
-            }
-            if (count != 1) {
+            isType = isType(sentencas.substring(0, fim + 1));
+            if (!isType){
                 return false;
             }
 
-            if (isIdentifier && isType) {
-                return true;
-            } else {
-                return false;
+        }else if (!sentencas.contains(" ")){
+
+            isType = isType(sentencas);
+            fim = sentencas.lastIndexOf(sentencas);
+        }else {
+            fim = sentencas.indexOf(" ");
+            System.out.println(fim);
+            isType = isType(sentencas.substring(0, fim));
+        }
+        String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
+        isIdentifier = isIdentifier(subSent);
+
+        sentencas.trim();
+
+        int count = 0;
+        for (int i = 0; i<sentencas.length(); i++){
+            if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
+                count = count+1;
             }
         }
-        return false;
-    }
+        if (count != 1){
+            return false;
+        }
 
+        if (isIdentifier && isType){
+            return true;
+        }else {
+            return false;
+        }
+
+    }
     //reconhecedor de Identifier; n se cominica com nenhum outro metodo a não ser que seja requisitado pelo metodo em questão
     private static boolean isIdentifier(String sentencas){
         if (!sentencas.isBlank() && !sentencas.isEmpty()) {
@@ -339,7 +337,8 @@ public final class ComandosInternos {
     public static boolean parametros(String sentenca){
         if (!sentenca.isEmpty() && !sentenca.isBlank()) {
             if (sentenca.contains(",")) {
-                if (!sentenca.endsWith(",")){
+                if (!sentenca.endsWith(",") && !sentenca.startsWith(",")){
+
                     String[] palavras = sentenca.split(",");
                     for (int x=0; x < palavras.length; x++){
                         if (!parametros(palavras[x])){
@@ -356,6 +355,22 @@ public final class ComandosInternos {
             }
             return false;
         }
+        return false;
+    }
+
+    private boolean avaliarDuplicidade(String sentenca){
+        String aux = sentenca.trim().replace(',',' ').trim();
+        String nomeRepetido = "";
+
+        if (!aux.isBlank() && !aux.isEmpty()){
+            String[] itens = sentenca.split(",");
+            for (int x=0; x < itens.length; x++){
+                if (itens[x].split(" ").length == 3){
+                    
+                }
+            }
+        }
+
         return false;
     }
 
