@@ -214,11 +214,43 @@ public final class ComandosInternos {
 
     //Reconhecedor de var; ele se comunica com isType() e isIdentifier
     //Reconhecedor de var; ele se comunica com isType() e isIdentifier
+    private static String formatar(String sentenca){
+        StringBuilder st = new StringBuilder(sentenca);
+        if (sentenca.contains("[") && sentenca.contains("]") && sentenca.indexOf('[') < sentenca.indexOf(']')){
+            while (sentenca.charAt(sentenca.indexOf('[')-1) == ' '){
+                sentenca = (st.deleteCharAt(sentenca.indexOf('[')-1)).toString();
+            }
+            while (sentenca.charAt(sentenca.indexOf(']')-1) != '['){
+                sentenca = (st.deleteCharAt(sentenca.indexOf(']')-1)).toString();
+            }
+        }
+        if (sentenca.charAt(sentenca.length()-1) == ';'){
+            while (sentenca.charAt(sentenca.length()-2) == ' '){
+                sentenca = (st.deleteCharAt(sentenca.indexOf(';')-1)).toString();
+            }
+        }
+
+        return sentenca;
+    }
+
+    //Reconhecedor de var; ele se comunica com isType() e isIdentifier
+    //Reconhecedor de var; ele se comunica com isType() e isIdentifier
     private static boolean isVar(String sentencas){
+        sentencas.trim();
+        sentencas = sentencas.replace("\n", "").replace("\r", "");
         boolean isType, isIdentifier;
         int fim;
+        sentencas = formatar(sentencas);
+        if ((sentencas.chars().filter(ch -> ch == ' ').count() != 1) || (sentencas.chars().filter(ch -> ch == ';').count() != 1)){
+            return false;
+        }
         if (sentencas.contains("[") || sentencas.contains("]")){
-            fim = Math.max(sentencas.indexOf("]"), sentencas.indexOf("["));
+
+            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
+                fim = sentencas.indexOf("]");
+            }else {
+                fim = sentencas.indexOf("[");
+            }
 
             //System.out.println(sentencas.substring(0, fim + 1));
             isType = isType(sentencas.substring(0, fim + 1));
@@ -239,9 +271,6 @@ public final class ComandosInternos {
         String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
         isIdentifier = isIdentifier(subSent);
 
-        sentencas.trim();
-        sentencas = sentencas.replace("\n", "").replace("\r", "");
-
         int count = 0;
         for (int i = 0; i<sentencas.length(); i++){
             if (sentencas.charAt(i) == ' ' && Character.isJavaIdentifierStart(sentencas.charAt(i+1))){
@@ -252,17 +281,30 @@ public final class ComandosInternos {
             return false;
         }
 
-        return isIdentifier && isType && sentencas.charAt(sentencas.length() - 1) == ';';
-
+        if (isIdentifier && isType && sentencas.charAt(sentencas.length()-1) == ';'){
+            return true;
+        }else {
+            return false;
+        }
     }
 
 
     //isVarM é o isVar sem ";"
     private static boolean isVarSpecial(String sentencas){
+        sentencas = sentencas.trim();
+        sentencas = sentencas.replace("\n", "").replace("\r", "");
         boolean isType, isIdentifier;
         int fim;
+        sentencas = formatar(sentencas);
+        if (sentencas.chars().filter(ch -> ch == ' ').count() != 1){
+            return false;
+        }
         if (sentencas.contains("[") || sentencas.contains("]")){
-            fim = Math.max(sentencas.indexOf("]"), sentencas.indexOf("["));
+            if (sentencas.indexOf("]") > sentencas.indexOf("[")){
+                fim = sentencas.indexOf("]");
+            }else {
+                fim = sentencas.indexOf("[");
+            }
             isType = isType(sentencas.substring(0, fim + 1));
             if (!isType){
                 return false;
@@ -274,13 +316,10 @@ public final class ComandosInternos {
             fim = sentencas.lastIndexOf(sentencas);
         }else {
             fim = sentencas.indexOf(" ");
-            System.out.println(fim);
             isType = isType(sentencas.substring(0, fim));
         }
         String subSent = sentencas.substring(fim + 1, sentencas.length() - 2).trim();
         isIdentifier = isIdentifier(subSent);
-
-        sentencas.trim();
 
         int count = 0;
         for (int i = 0; i<sentencas.length(); i++){
@@ -292,7 +331,11 @@ public final class ComandosInternos {
             return false;
         }
 
-        return isIdentifier && isType;
+        if (isIdentifier && isType){
+            return true;
+        }else {
+            return false;
+        }
 
     }
     //reconhecedor de Identifier; n se cominica com nenhum outro metodo a não ser que seja requisitado pelo metodo em questão
