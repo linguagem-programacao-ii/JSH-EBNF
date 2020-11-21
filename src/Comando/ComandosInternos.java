@@ -91,7 +91,7 @@ public final class ComandosInternos {
         }
         out = out.trim();
         boolean pass = false;
-
+        String outV2 = out;
         try {
             if (!out.isBlank() && !out.isEmpty()) {
                 System.out.println(out);
@@ -102,7 +102,7 @@ public final class ComandosInternos {
                 } else if (separacao.length == 1) {
                     pass = isType(out);
                 } else {
-                    pass = isVar(out);
+                    pass = isVar(outV2);
                 }
             }
         }catch (Exception e){
@@ -123,7 +123,7 @@ public final class ComandosInternos {
         String saida = entrada.trim();
 
         if (saida.split(" ").length > 1) {
-            saida = saida.replaceAll("\s+", " ");
+            saida = saida.replaceAll("\\s+", " ");
             System.out.println(saida);
 
             if (saida.contains(" ;")) {
@@ -349,7 +349,7 @@ public final class ComandosInternos {
                             aux = sentenca.substring(sentenca.indexOf(')')).trim();
                             if (aux.contains("{")) {
                                 aux = sentenca.substring(sentenca.indexOf(')'), sentenca.indexOf('{') + 1).trim();
-                                aux = aux.replaceAll("\s+", "");
+                                aux = aux.replaceAll("\\s+", "");
                                 if (aux.equals("){")) {
                                     aux = sentenca.substring(sentenca.indexOf('{')).trim();
                                     return aux.endsWith("}");
