@@ -94,9 +94,8 @@ public final class ComandosInternos {
 
         try {
             if (!out.isBlank() && !out.isEmpty()) {
-                System.out.println("antes do tratar: " + out);
+                System.out.println(out);
                 out = tratar(out);
-                System.out.println("depois " + out);
                 String[] separacao = out.split(" ");
                 if (separacao[0].equals("public")) {
                     pass = isMethod(out);
@@ -121,51 +120,24 @@ public final class ComandosInternos {
     }
 
     private static String tratar(String entrada){
-        if (entrada.contains("[")){
-            String aux = entrada.substring(entrada.indexOf("["));
-            if (aux.contains("]")){
-                aux = entrada.substring(1, aux.lastIndexOf("]"));
-                if (aux.length() > 1) {
-                    StringBuilder replace = new StringBuilder("[");
-                    for (int x = 0; x < aux.length(); x++) {
-                        if (aux.charAt(x) != ' '){
-                            return " ";
-                        }
-                        replace.append(' ');
-                    }
-                    replace.append(']');
-                    entrada = entrada.replace(replace.toString(), "[]");
-                }
-                String[] palavras = entrada.split(" ");
-                StringBuilder saida = new StringBuilder();
-                for (int x=0; x < palavras.length; x++){
-                    palavras[x] = palavras[x].trim();
-                    saida.append(palavras[x]).append(' ');
-                    if (palavras[x].equals(";")){
-                        saida = new StringBuilder(saida.toString().trim() + palavras[x] + ' ');
-                    }
-                }
+        String saida = entrada.trim();
 
-                if (saida.toString().contains("int []")){
-                    saida = new StringBuilder(saida.toString().replace("int []", "int[]"));
-                }
-                return saida.toString();
+        if (saida.split(" ").length > 1) {
+            saida = saida.replaceAll("\s+", " ");
+            System.out.println(saida);
+
+            if (saida.contains(" ;")) {
+                saida = saida.replaceAll(" ;", ";").trim();
             }
-        }
-        String[] palavras = entrada.split(" ");
-        StringBuilder saida = new StringBuilder();
-        if (palavras.length > 1) {
-            for (int x = 0; x < palavras.length; x++) {
-                palavras[x] = palavras[x].trim();
-                saida.append(palavras[x]).append(' ');
-                if (palavras[x].equals(";")) {
-                    saida = new StringBuilder(saida.toString().trim() + palavras[x] + ' ');
+            if (saida.contains(" [")){
+                saida = saida.replaceAll(" \\[", "[").trim();
+                if (saida.contains(" ]")){
+                    saida = saida.replaceAll(" ]", "]").trim();
                 }
             }
-        }else {
-            return entrada;
         }
-        return saida.toString().trim();
+
+        return saida;
     }
 
 
@@ -360,22 +332,25 @@ public final class ComandosInternos {
     private static boolean isMethod(String sentenca){
         sentenca = sentenca.trim();
             if (sentenca.contains("(")) {
-                String aux = sentenca.substring(0, sentenca.indexOf('(') - 1).trim(); //Até antes de encontrar (
+                String aux = sentenca.substring(0, sentenca.indexOf('(')).trim(); //Até antes de encontrar (
                 if (declaration(aux)) {
                     aux = sentenca.substring(sentenca.indexOf('(')).trim();
                     if (aux.contains(")")) {
-                        aux = sentenca.substring(sentenca.indexOf('(') + 1, sentenca.lastIndexOf(')') - 1).trim();
+                        aux = sentenca.substring(sentenca.indexOf('(') + 1, sentenca.lastIndexOf(')')).trim();
+
                         boolean pass = false;
                         if (!aux.isEmpty() && !aux.isBlank()) {
                             pass = parametros(aux.trim());
                         } else {
                             pass = true;
                         }
+
                         if (pass) {
                             aux = sentenca.substring(sentenca.indexOf(')')).trim();
                             if (aux.contains("{")) {
-                                aux = sentenca.substring(sentenca.indexOf(')') + 1, sentenca.indexOf('{') - 1).trim();
-                                if (aux.isBlank() || aux.isEmpty()) {
+                                aux = sentenca.substring(sentenca.indexOf(')'), sentenca.indexOf('{') + 1).trim();
+                                aux = aux.replaceAll("\s+", "");
+                                if (aux.equals("){")) {
                                     aux = sentenca.substring(sentenca.indexOf('{')).trim();
                                     return aux.endsWith("}");
                                 }
@@ -435,20 +410,25 @@ public final class ComandosInternos {
 
         if (!aux.isBlank() && !aux.isEmpty()){
             String[] itens = sentenca.split(",");
+            List<String> avaliar = new ArrayList<>();
             for (String iten : itens) {
+                iten = iten.trim();
                 if (iten.split(" ").length != 2) {
                     return false;
                 }
+                avaliar.add(iten.split(" ")[1]);
             }
-            for (int x=0; x < itens.length; x++){
-                for (int y=0; y < itens.length; y++){
+
+            for (int x=0; x < avaliar.size(); x++){
+                for (int y=0; y < avaliar.size(); y++) {
                     if (x != y){
-                        if (itens[x].split(" ")[1].equals(itens[y].split(" ")[1])){
+                        if (avaliar.get(x).equals(avaliar.get(y))){
                             return false;
                         }
                     }
                 }
             }
+
         }else {
             return false;
         }
