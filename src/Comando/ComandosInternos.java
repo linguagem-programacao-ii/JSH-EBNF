@@ -94,7 +94,9 @@ public final class ComandosInternos {
 
         try {
             if (!out.isBlank() && !out.isEmpty()) {
+                System.out.println("antes do tratar: " + out);
                 out = tratar(out);
+                System.out.println("depois " + out);
                 String[] separacao = out.split(" ");
                 if (separacao[0].equals("public")) {
                     pass = isMethod(out);
