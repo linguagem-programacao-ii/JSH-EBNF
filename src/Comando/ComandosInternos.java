@@ -92,6 +92,7 @@ public final class ComandosInternos {
         out = out.trim();
         boolean pass = false;
         String outV2 = out;
+        String classification = "";
         try {
             if (!out.isBlank() && !out.isEmpty()) {
                 System.out.println(out);
@@ -99,10 +100,19 @@ public final class ComandosInternos {
                 String[] separacao = out.split(" ");
                 if (separacao[0].equals("public")) {
                     pass = isMethod(out);
+                    if(pass){
+                        classification = " methodDeclaration";
+                    }
                 } else if (separacao.length == 1) {
                     pass = isType(out);
+                    if(pass){
+                        classification = " type";
+                    }
                 } else {
                     pass = isVar(outV2);
+                    if(pass){
+                        classification = " varDeclaration";
+                    }
                 }
             }
         }catch (Exception e){
@@ -111,7 +121,7 @@ public final class ComandosInternos {
 
 
         if (pass) {
-            System.out.println("Tudo certo por aqui");
+            System.out.println("Sentença reconhecida" + " como:" + classification);
         } else {
             System.out.println("A sentença está errada");
         }
@@ -124,7 +134,7 @@ public final class ComandosInternos {
 
         if (saida.split(" ").length > 1) {
             saida = saida.replaceAll("\\s+", " ");
-            System.out.println(saida);
+            //System.out.println(saida);
 
             if (saida.contains(" ;")) {
                 saida = saida.replaceAll(" ;", ";").trim();
